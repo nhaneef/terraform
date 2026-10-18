@@ -1,0 +1,225 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "azurerm"
+      version = "4.58.0"
+    }
+  }
+}
+provider "azurerm" {
+  features {}
+}
+resource "azurerm_resource_group" "res-0" {
+  location   = "qatarcentral"
+  managed_by = ""
+  name       = "rg-ems-network-dev-qc-001"
+  tags       = {}
+}
+resource "azurerm_virtual_network" "res-1" {
+  address_space                  = ["172.22.208.0/25"]
+  bgp_community                  = ""
+  dns_servers                    = []
+  edge_zone                      = ""
+  flow_timeout_in_minutes        = 0
+  location                       = "qatarcentral"
+  name                           = "vnet-ems-network-dev-qc-001"
+  private_endpoint_vnet_policies = "Disabled"
+  resource_group_name            = azurerm_resource_group.res-0.name
+  subnet = [{
+    address_prefixes                              = ["172.22.208.0/27"]
+    default_outbound_access_enabled               = false
+    delegation                                    = []
+    id                                            = azurerm_subnet_route_table_association.res-12.id
+    name                                          = "snet-ems-paas-dev-qc-001"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-paas-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-paas-dev-qc"
+    security_group                                = ""
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+    }, {
+    address_prefixes                              = ["172.22.208.32/27"]
+    default_outbound_access_enabled               = false
+    delegation                                    = []
+    id                                            = azurerm_subnet_route_table_association.res-3.id
+    name                                          = "snet-ems-aks-dev-qc-001"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-aks-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-aks-dev-qc"
+    security_group                                = ""
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+    }, {
+    address_prefixes                              = ["172.22.208.64/28"]
+    default_outbound_access_enabled               = false
+    delegation                                    = []
+    id                                            = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-network-dev-qc-001/providers/Microsoft.Network/virtualNetworks/vnet-ems-network-dev-qc-001/subnets/snet-ems-iaas-dev-qc-001"
+    name                                          = "snet-ems-iaas-dev-qc-001"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-iaas-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-iaas-dev-qc"
+    security_group                                = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-iaas-dev-qc-001/providers/Microsoft.Network/networkSecurityGroups/nsg-ems-iaas-dev-qc-001"
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+    }, {
+    address_prefixes                              = ["172.22.208.80/28"]
+    default_outbound_access_enabled               = false
+    delegation                                    = []
+    id                                            = azurerm_subnet_route_table_association.res-7.id
+    name                                          = "snet-ems-db-dev-qc-001"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-db-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-db-dev-qc"
+    security_group                                = ""
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+    }, {
+    address_prefixes                              = ["172.22.208.96/28"]
+    default_outbound_access_enabled               = false
+    delegation                                    = []
+    id                                            = azurerm_subnet_route_table_association.res-5.id
+    name                                          = "snet-ems-apim-dev-qc-001"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-apim-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-apim-dev"
+    security_group                                = ""
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+  }]
+  tags = {
+    Approver       = "ISD"
+    BusinessUnit   = "EMS"
+    CostCenter     = "EMS"
+    Environment    = "DEV"
+    ManagingVendor = "intalio"
+    Project        = "EMS"
+    System         = "Non-critical"
+  }
+  depends_on = [
+    # One of azurerm_subnet_network_security_group_association.res-9,azurerm_subnet_route_table_association.res-10 (can't auto-resolve as their ids are identical)
+  ]
+}
+resource "azurerm_subnet" "res-2" {
+  address_prefixes                              = ["172.22.208.32/27"]
+  default_outbound_access_enabled               = true
+  name                                          = "snet-ems-aks-dev-qc-001"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = azurerm_resource_group.res-0.name
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  sharing_scope                                 = ""
+  virtual_network_name                          = "vnet-ems-network-dev-qc-001"
+  depends_on = [
+    azurerm_virtual_network.res-1,
+  ]
+}
+resource "azurerm_subnet_route_table_association" "res-3" {
+  route_table_id = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-aks-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-aks-dev-qc"
+  subnet_id      = azurerm_subnet.res-2.id
+}
+resource "azurerm_subnet" "res-4" {
+  address_prefixes                              = ["172.22.208.96/28"]
+  default_outbound_access_enabled               = true
+  name                                          = "snet-ems-apim-dev-qc-001"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = azurerm_resource_group.res-0.name
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  sharing_scope                                 = ""
+  virtual_network_name                          = "vnet-ems-network-dev-qc-001"
+  depends_on = [
+    azurerm_virtual_network.res-1,
+  ]
+}
+resource "azurerm_subnet_route_table_association" "res-5" {
+  route_table_id = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-apim-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-apim-dev"
+  subnet_id      = azurerm_subnet.res-4.id
+}
+resource "azurerm_subnet" "res-6" {
+  address_prefixes                              = ["172.22.208.80/28"]
+  default_outbound_access_enabled               = true
+  name                                          = "snet-ems-db-dev-qc-001"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = azurerm_resource_group.res-0.name
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  sharing_scope                                 = ""
+  virtual_network_name                          = "vnet-ems-network-dev-qc-001"
+  depends_on = [
+    azurerm_virtual_network.res-1,
+  ]
+}
+resource "azurerm_subnet_route_table_association" "res-7" {
+  route_table_id = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-db-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-db-dev-qc"
+  subnet_id      = azurerm_subnet.res-6.id
+}
+resource "azurerm_subnet" "res-8" {
+  address_prefixes                              = ["172.22.208.64/28"]
+  default_outbound_access_enabled               = true
+  name                                          = "snet-ems-iaas-dev-qc-001"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = azurerm_resource_group.res-0.name
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  sharing_scope                                 = ""
+  virtual_network_name                          = "vnet-ems-network-dev-qc-001"
+  depends_on = [
+    azurerm_virtual_network.res-1,
+  ]
+}
+resource "azurerm_subnet_network_security_group_association" "res-9" {
+  network_security_group_id = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-iaas-dev-qc-001/providers/Microsoft.Network/networkSecurityGroups/nsg-ems-iaas-dev-qc-001"
+  subnet_id                 = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-network-dev-qc-001/providers/Microsoft.Network/virtualNetworks/vnet-ems-network-dev-qc-001/subnets/snet-ems-iaas-dev-qc-001"
+  depends_on = [
+    azurerm_subnet.res-8,
+    # One of azurerm_subnet.res-8,azurerm_subnet_route_table_association.res-10 (can't auto-resolve as their ids are identical)
+  ]
+}
+resource "azurerm_subnet_route_table_association" "res-10" {
+  route_table_id = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-iaas-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-iaas-dev-qc"
+  subnet_id      = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-network-dev-qc-001/providers/Microsoft.Network/virtualNetworks/vnet-ems-network-dev-qc-001/subnets/snet-ems-iaas-dev-qc-001"
+  depends_on = [
+    azurerm_subnet.res-8,
+    # One of azurerm_subnet.res-8,azurerm_subnet_network_security_group_association.res-9 (can't auto-resolve as their ids are identical)
+  ]
+}
+resource "azurerm_subnet" "res-11" {
+  address_prefixes                              = ["172.22.208.0/27"]
+  default_outbound_access_enabled               = true
+  name                                          = "snet-ems-paas-dev-qc-001"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = azurerm_resource_group.res-0.name
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  sharing_scope                                 = ""
+  virtual_network_name                          = "vnet-ems-network-dev-qc-001"
+  depends_on = [
+    azurerm_virtual_network.res-1,
+  ]
+}
+resource "azurerm_subnet_route_table_association" "res-12" {
+  route_table_id = "/subscriptions/caafb394-ee5c-452c-bfa9-9bc21995e827/resourceGroups/rg-ems-paas-dev-qc-001/providers/Microsoft.Network/routeTables/rt-ems-paas-dev-qc"
+  subnet_id      = azurerm_subnet.res-11.id
+}
+resource "azurerm_virtual_network_peering" "res-13" {
+  allow_forwarded_traffic                = true
+  allow_gateway_transit                  = false
+  allow_virtual_network_access           = true
+  local_subnet_names                     = []
+  name                                   = "peer-vnet-ems-network-dev-qc-001-to-vnet-connectivity-qc-001"
+  only_ipv6_peering_enabled              = false
+  peer_complete_virtual_networks_enabled = true
+  remote_subnet_names                    = []
+  remote_virtual_network_id              = "/subscriptions/845b4977-4f63-4971-a926-dd691fd2e258/resourceGroups/rg-network-connectivity-qc-001/providers/Microsoft.Network/virtualNetworks/vnet-connectivity-qc-001"
+  resource_group_name                    = azurerm_resource_group.res-0.name
+  use_remote_gateways                    = true
+  virtual_network_name                   = "vnet-ems-network-dev-qc-001"
+  depends_on = [
+    azurerm_virtual_network.res-1,
+  ]
+}
