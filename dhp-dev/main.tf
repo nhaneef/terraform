@@ -38,7 +38,7 @@ resource "azurerm_virtual_network" "vnetdev" {
   name                = "vnet-moph-dhp-dev-qc-001"
   resource_group_name = azurerm_resource_group.rgdev.name
   location            = azurerm_resource_group.rgdev.location
-  address_space       = ["172.30.240.64/27"]
+  address_space       = ["172.30.240.64/27","172.28.196.248/29"]
 }
 resource "azurerm_subnet" "vms" {
   name                              = "snet-moph-dhp-dev-vm-qc-001"
@@ -56,6 +56,13 @@ resource "azurerm_subnet" "pe" {
   private_endpoint_network_policies = "Disabled"
 }
 
+resource "azurerm_subnet" "dbcls" {
+  name                              = "snet-moph-dhp-dev-dbcls-qc-001"
+  virtual_network_name              = azurerm_virtual_network.vnetdev.name
+  resource_group_name               = azurerm_resource_group.rgdev.name
+  address_prefixes                  = ["172.28.196.248/29"]
+  private_endpoint_network_policies = "Disabled"
+}
 resource "azurerm_network_security_group" "nsgvms" {
   name                = "nsg-moph-dhp-dev-vm-qc-001"
   resource_group_name = azurerm_resource_group.rgdev.name
@@ -113,9 +120,26 @@ resource "azurerm_route_table" "rt_pe" {
   }
 }
 
+resource "azurerm_route_table" "rt_dbcls" {
+  name                = "rt-moph-dhp-dev-dbcls-qc-001"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  route {
+    name                   = "default"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = "172.28.136.71"
+  }
+}
 resource "azurerm_subnet_route_table_association" "rt_pe_assoc" {
   subnet_id      = azurerm_subnet.pe.id
   route_table_id = azurerm_route_table.rt_pe.id
+}
+
+resource "azurerm_subnet_route_table_association" "rt_dbcls_assoc" {
+  subnet_id      = azurerm_subnet.dbcls.id
+  route_table_id = azurerm_route_table.rt_dbcls.id
 }
 #####################################################################
 # Vnet Peering t
@@ -351,7 +375,36 @@ resource "azurerm_network_interface" "dev02_nic" {
   }
 }
 
+##################################################
+# DB01 NIC
+##################################################
 
+resource "azurerm_network_interface" "db01_nic" {
+  name                = "mophazddhpdb01-nic"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  ip_configuration {
+    name                          = "ipconfig1"
+    subnet_id                     = azurerm_subnet.vms.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+##################################################
+# DB02 NIC
+##################################################
+resource "azurerm_network_interface" "db02_nic" {
+  name                = "mophazddhpdb02-nic"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  ip_configuration {
+    name                          = "ipconfig1"
+    subnet_id                     = azurerm_subnet.vms.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
 ##################################################
 # DEV01 VM
 ##################################################
@@ -451,6 +504,105 @@ resource "azurerm_windows_virtual_machine" "dev02" {
 }
 
 ##################################################
+# DB01 VM
+##################################################
+
+resource "azurerm_windows_virtual_machine" "db01" {
+
+  name          = "mophazddhpdb01"
+  computer_name = "mophazddhpdb01"
+
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  # zone                = "1"
+
+  size = "Standard_D4s_v5"
+
+  admin_username = "mophazadmin"
+  admin_password = var.admin_password
+
+  license_type = local.windows_license_type
+
+  network_interface_ids = [
+    azurerm_network_interface.db01_nic.id
+  ]
+
+  encryption_at_host_enabled = true
+  secure_boot_enabled        = true
+  vtpm_enabled               = true
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  os_disk {
+    name                   = "mophazddhpdb01-osdisk"
+    caching                = "ReadWrite"
+    storage_account_type   = "StandardSSD_LRS"
+    disk_size_gb           = 200
+    disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2025-datacenter-g2"
+    version   = "latest"
+  }
+}
+
+
+
+##################################################
+# DB01 VM
+##################################################
+
+resource "azurerm_windows_virtual_machine" "db02" {
+
+  name          = "mophazddhpdb02"
+  computer_name = "mophazddhpdb02"
+
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  # zone                = "1"
+
+  size = "Standard_D4s_v5"
+
+  admin_username = "mophazadmin"
+  admin_password = var.admin_password
+
+  license_type = local.windows_license_type
+
+  network_interface_ids = [
+    azurerm_network_interface.db02_nic.id
+  ]
+
+  encryption_at_host_enabled = true
+  secure_boot_enabled        = true
+  vtpm_enabled               = true
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  os_disk {
+    name                   = "mophazddhpdb02-osdisk"
+    caching                = "ReadWrite"
+    storage_account_type   = "StandardSSD_LRS"
+    disk_size_gb           = 200
+    disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2025-datacenter-g2"
+    version   = "latest"
+  }
+}
+##################################################
 # DEV01 DATA DISK
 ##################################################
 
@@ -532,5 +684,66 @@ resource "azurerm_virtual_machine_data_disk_attachment" "dev02_log" {
   virtual_machine_id = azurerm_windows_virtual_machine.dev02.id
 
   lun     = 1
+  caching = "None"
+}
+
+##################################################
+# DB01 DATA DISK
+##################################################
+
+resource "azurerm_managed_disk" "db01_data" {
+  name                = "mophazddhpdb01-data"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 2500
+
+  disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+}
+resource "azurerm_virtual_machine_data_disk_attachment" "db01_data" {
+  managed_disk_id    = azurerm_managed_disk.db01_data.id
+  virtual_machine_id = azurerm_windows_virtual_machine.db01.id
+
+  lun     = 1
+  caching = "None"
+}
+
+resource "azurerm_managed_disk" "db01_log" {
+  name                = "mophazddhpdb01-log"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 700
+
+  disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+}
+resource "azurerm_virtual_machine_data_disk_attachment" "db01_log" {
+  managed_disk_id    = azurerm_managed_disk.db01_log.id
+  virtual_machine_id = azurerm_windows_virtual_machine.db01.id
+
+  lun     = 2
+  caching = "None"
+}
+
+resource "azurerm_managed_disk" "db01_temp" {
+  name                = "mophazddhpdb01-temp"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 300
+
+  disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+}
+resource "azurerm_virtual_machine_data_disk_attachment" "db01_temp" {
+  managed_disk_id    = azurerm_managed_disk.db01_temp.id
+  virtual_machine_id = azurerm_windows_virtual_machine.db01.id
+
+  lun     = 3
   caching = "None"
 }

@@ -80,6 +80,22 @@ resource "azurerm_subnet" "pe" {
   address_prefixes                  = ["172.30.236.96/28"]
   private_endpoint_network_policies = "Disabled"
 }
+
+resource "azurerm_subnet" "db" {
+  name                              = "snet-moph-dhp-stg-db-qc-001"
+  virtual_network_name              = azurerm_virtual_network.vnetstg.name
+  resource_group_name               = azurerm_resource_group.rgstg.name
+  address_prefixes                  = ["172.30.236.112/29"]
+  private_endpoint_network_policies = "Disabled"
+}
+
+resource "azurerm_subnet" "dbcls" {
+  name                              = "snet-moph-dhp-stg-dbcls-qc-001"
+  virtual_network_name              = azurerm_virtual_network.vnetstg.name
+  resource_group_name               = azurerm_resource_group.rgstg.name
+  address_prefixes                  = ["172.30.236.120/29"]
+  private_endpoint_network_policies = "Disabled"
+}
 ###########################################################
 # Route Table
 
@@ -137,6 +153,42 @@ resource "azurerm_subnet_route_table_association" "rt_pe_assoc" {
   subnet_id      = azurerm_subnet.pe.id
   route_table_id = azurerm_route_table.rt_pe.id
 }
+
+resource "azurerm_route_table" "rt_db" {
+  name                = "rt-moph-dhp-stg-db-qc-001"
+  location            = azurerm_resource_group.rgstg.location
+  resource_group_name = azurerm_resource_group.rgstg.name
+
+  route {
+    name                   = "default"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = "172.28.136.71"
+  }
+}
+
+resource "azurerm_subnet_route_table_association" "rt_db_assoc" {
+  subnet_id      = azurerm_subnet.db.id
+  route_table_id = azurerm_route_table.rt_db.id
+}
+
+resource "azurerm_route_table" "rt_dbcls" {
+  name                = "rt-moph-dhp-stg-dbcls-qc-001"
+  location            = azurerm_resource_group.rgstg.location
+  resource_group_name = azurerm_resource_group.rgstg.name
+
+  route {
+    name                   = "default"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = "172.28.136.71"
+  }
+}
+
+resource "azurerm_subnet_route_table_association" "rt_dbcls_assoc" {
+  subnet_id      = azurerm_subnet.dbcls.id
+  route_table_id = azurerm_route_table.rt_dbcls.id
+}
 ##################################################
 # Network Security Groups
 ##################################################
@@ -159,6 +211,17 @@ resource "azurerm_network_security_group" "nsgpe" {
   location            = azurerm_resource_group.rgstg.location
 }
 
+resource "azurerm_network_security_group" "nsgdb" {
+  name                = "nsg-moph-dhp-stg-db-qc-001"
+  resource_group_name = azurerm_resource_group.rgstg.name
+  location            = azurerm_resource_group.rgstg.location
+}
+
+resource "azurerm_network_security_group" "nsgdbcls" {
+  name                = "nsg-moph-dhp-stg-dbcls-qc-001"
+  resource_group_name = azurerm_resource_group.rgstg.name
+  location            = azurerm_resource_group.rgstg.location
+}
 resource "azurerm_subnet_network_security_group_association" "nsg_app_association" {
   subnet_id                 = azurerm_subnet.app.id
   network_security_group_id = azurerm_network_security_group.nsgapp.id
@@ -173,6 +236,16 @@ resource "azurerm_subnet_network_security_group_association" "nsg_pe_association
   subnet_id                 = azurerm_subnet.pe.id
   network_security_group_id = azurerm_network_security_group.nsgpe.id
 }
+
+resource "azurerm_subnet_network_security_group_association" "nsg_db_association" {
+  subnet_id                 = azurerm_subnet.db.id
+  network_security_group_id = azurerm_network_security_group.nsgdb.id
+  }
+
+resource "azurerm_subnet_network_security_group_association" "nsg_dbcls_association" {
+  subnet_id                 = azurerm_subnet.dbcls.id
+  network_security_group_id = azurerm_network_security_group.nsgdbcls.id
+  }
 
 ##################################################
 # Hub VNet and Peerings
