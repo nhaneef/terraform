@@ -39,6 +39,11 @@ resource "azurerm_virtual_network" "vnetdev" {
   resource_group_name = azurerm_resource_group.rgdev.name
   location            = azurerm_resource_group.rgdev.location
   address_space       = ["172.30.240.64/27","172.28.196.248/29"]
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 resource "azurerm_subnet" "vms" {
   name                              = "snet-moph-dhp-dev-vm-qc-001"
@@ -67,11 +72,21 @@ resource "azurerm_network_security_group" "nsgvms" {
   name                = "nsg-moph-dhp-dev-vm-qc-001"
   resource_group_name = azurerm_resource_group.rgdev.name
   location            = azurerm_resource_group.rgdev.location
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 resource "azurerm_network_security_group" "nsgpe" {
   name                = "nsg-moph-dhp-dev-pe-qc-001"
   resource_group_name = azurerm_resource_group.rgdev.name
   location            = azurerm_resource_group.rgdev.location
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "nsgvmsasso" {
@@ -100,6 +115,11 @@ resource "azurerm_route_table" "rt_vm" {
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "172.28.136.71"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_subnet_route_table_association" "rt_vm_assoc" {
@@ -118,6 +138,11 @@ resource "azurerm_route_table" "rt_pe" {
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "172.28.136.71"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_route_table" "rt_dbcls" {
@@ -130,6 +155,11 @@ resource "azurerm_route_table" "rt_dbcls" {
     address_prefix         = "0.0.0.0/0"
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "172.28.136.71"
+  }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
 resource "azurerm_subnet_route_table_association" "rt_pe_assoc" {
@@ -195,6 +225,11 @@ resource "azurerm_user_assigned_identity" "uami" {
   name                = "id-moph-dhp-dev-cmk-qc-001"
   resource_group_name = azurerm_resource_group.rgdev.name
   location            = azurerm_resource_group.rgdev.location
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 #############################################################
 # Key Vault
@@ -213,6 +248,12 @@ resource "azurerm_key_vault" "kv" {
   soft_delete_retention_days = 90
 
   public_network_access_enabled = false
+
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 #####################################################################
@@ -236,6 +277,11 @@ resource "azurerm_private_endpoint" "pekv" {
 
     private_dns_zone_ids = [
       data.azurerm_private_dns_zone.dnskv.id
+    ]
+  }
+    lifecycle {
+    ignore_changes = [
+      tags
     ]
   }
 }
@@ -339,6 +385,11 @@ resource "azurerm_disk_encryption_set" "des" {
   depends_on = [
     azurerm_role_assignment.crypto_user
   ]
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 
@@ -357,6 +408,11 @@ resource "azurerm_network_interface" "dev01_nic" {
     subnet_id                     = azurerm_subnet.vms.id
     private_ip_address_allocation = "Dynamic"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 ##################################################
@@ -372,6 +428,11 @@ resource "azurerm_network_interface" "dev02_nic" {
     name                          = "ipconfig1"
     subnet_id                     = azurerm_subnet.vms.id
     private_ip_address_allocation = "Dynamic"
+  }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
 
@@ -389,6 +450,11 @@ resource "azurerm_network_interface" "db01_nic" {
     subnet_id                     = azurerm_subnet.vms.id
     private_ip_address_allocation = "Dynamic"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 ##################################################
@@ -403,6 +469,11 @@ resource "azurerm_network_interface" "db02_nic" {
     name                          = "ipconfig1"
     subnet_id                     = azurerm_subnet.vms.id
     private_ip_address_allocation = "Dynamic"
+  }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
 ##################################################
@@ -451,6 +522,11 @@ resource "azurerm_windows_virtual_machine" "dev01" {
     offer     = "WindowsServer"
     sku       = "2025-datacenter-g2"
     version   = "latest"
+  }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
 
@@ -501,6 +577,11 @@ resource "azurerm_windows_virtual_machine" "dev02" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 ##################################################
@@ -515,9 +596,9 @@ resource "azurerm_windows_virtual_machine" "db01" {
   location            = azurerm_resource_group.rgdev.location
   resource_group_name = azurerm_resource_group.rgdev.name
 
-  # zone                = "1"
+  #zone                = "1"
 
-  size = "Standard_D4s_v5"
+  size = "Standard_D8s_v5"
 
   admin_username = "mophazadmin"
   admin_password = var.admin_password
@@ -550,12 +631,17 @@ resource "azurerm_windows_virtual_machine" "db01" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 
 
 ##################################################
-# DB01 VM
+# DB02 VM
 ##################################################
 
 resource "azurerm_windows_virtual_machine" "db02" {
@@ -566,9 +652,9 @@ resource "azurerm_windows_virtual_machine" "db02" {
   location            = azurerm_resource_group.rgdev.location
   resource_group_name = azurerm_resource_group.rgdev.name
 
-  # zone                = "1"
+  #  zone                = "2"
 
-  size = "Standard_D4s_v5"
+  size = "Standard_D8s_v5"
 
   admin_username = "mophazadmin"
   admin_password = var.admin_password
@@ -601,6 +687,11 @@ resource "azurerm_windows_virtual_machine" "db02" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 ##################################################
 # DEV01 DATA DISK
@@ -616,6 +707,11 @@ resource "azurerm_managed_disk" "dev01_data" {
   disk_size_gb         = 500
 
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "dev01_data" {
@@ -637,6 +733,11 @@ resource "azurerm_managed_disk" "dev02_data" {
   disk_size_gb         = 500
 
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "dev02_data" {
@@ -657,6 +758,11 @@ resource "azurerm_managed_disk" "dev01_log" {
   disk_size_gb         = 80
 
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_managed_disk" "dev02_log" {
@@ -669,6 +775,11 @@ resource "azurerm_managed_disk" "dev02_log" {
   disk_size_gb         = 80
 
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "dev01_log" {
@@ -701,6 +812,11 @@ resource "azurerm_managed_disk" "db01_data" {
   disk_size_gb         = 2500
 
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 resource "azurerm_virtual_machine_data_disk_attachment" "db01_data" {
   managed_disk_id    = azurerm_managed_disk.db01_data.id
@@ -720,6 +836,11 @@ resource "azurerm_managed_disk" "db01_log" {
   disk_size_gb         = 700
 
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 resource "azurerm_virtual_machine_data_disk_attachment" "db01_log" {
   managed_disk_id    = azurerm_managed_disk.db01_log.id
@@ -739,6 +860,11 @@ resource "azurerm_managed_disk" "db01_temp" {
   disk_size_gb         = 300
 
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 resource "azurerm_virtual_machine_data_disk_attachment" "db01_temp" {
   managed_disk_id    = azurerm_managed_disk.db01_temp.id
