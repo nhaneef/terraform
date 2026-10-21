@@ -46,6 +46,11 @@ variable "admin_password" {
 resource "azurerm_resource_group" "rgstg" {
   name     = "rg-moph-dhp-stg-qc-001"
   location = "Qatar Central"
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 ##################################################
@@ -57,6 +62,11 @@ resource "azurerm_virtual_network" "vnetstg" {
   resource_group_name = azurerm_resource_group.rgstg.name
   location            = azurerm_resource_group.rgstg.location
   address_space       = ["172.30.236.64/26"]
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_subnet" "app" {
@@ -110,6 +120,11 @@ resource "azurerm_route_table" "rt_app" {
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "172.28.136.71"
   }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_subnet_route_table_association" "rt_app_assoc" {
@@ -147,6 +162,11 @@ resource "azurerm_route_table" "rt_pe" {
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "172.28.136.71"
   }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_subnet_route_table_association" "rt_pe_assoc" {
@@ -164,6 +184,11 @@ resource "azurerm_route_table" "rt_db" {
     address_prefix         = "0.0.0.0/0"
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "172.28.136.71"
+  }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
 
@@ -183,6 +208,11 @@ resource "azurerm_route_table" "rt_dbcls" {
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "172.28.136.71"
   }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_subnet_route_table_association" "rt_dbcls_assoc" {
@@ -197,30 +227,55 @@ resource "azurerm_network_security_group" "nsgapp" {
   name                = "nsg-moph-dhp-stg-app-qc-001"
   resource_group_name = azurerm_resource_group.rgstg.name
   location            = azurerm_resource_group.rgstg.location
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_network_security_group" "nsgwfe" {
   name                = "nsg-moph-dhp-stg-wfe-qc-001"
   resource_group_name = azurerm_resource_group.rgstg.name
   location            = azurerm_resource_group.rgstg.location
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_network_security_group" "nsgpe" {
   name                = "nsg-moph-dhp-stg-pe-qc-001"
   resource_group_name = azurerm_resource_group.rgstg.name
   location            = azurerm_resource_group.rgstg.location
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_network_security_group" "nsgdb" {
   name                = "nsg-moph-dhp-stg-db-qc-001"
   resource_group_name = azurerm_resource_group.rgstg.name
   location            = azurerm_resource_group.rgstg.location
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_network_security_group" "nsgdbcls" {
   name                = "nsg-moph-dhp-stg-dbcls-qc-001"
   resource_group_name = azurerm_resource_group.rgstg.name
   location            = azurerm_resource_group.rgstg.location
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 resource "azurerm_subnet_network_security_group_association" "nsg_app_association" {
   subnet_id                 = azurerm_subnet.app.id
@@ -288,6 +343,11 @@ resource "azurerm_user_assigned_identity" "uami" {
   name                = "id-moph-dhp-stg-cmk-qc-001"
   resource_group_name = azurerm_resource_group.rgstg.name
   location            = azurerm_resource_group.rgstg.location
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 ##################################################
@@ -305,6 +365,11 @@ resource "azurerm_key_vault" "kv" {
   purge_protection_enabled     = true
   soft_delete_retention_days   = 90
   public_network_access_enabled = true
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 data "azurerm_private_dns_zone" "dnskv" {
@@ -403,5 +468,10 @@ resource "azurerm_disk_encryption_set" "des" {
 
   depends_on = [
     azurerm_role_assignment.crypto_user
-  ]
+  ] 
+   lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }

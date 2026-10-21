@@ -873,3 +873,28 @@ resource "azurerm_virtual_machine_data_disk_attachment" "db01_temp" {
   lun     = 3
   caching = "None"
 }
+
+
+resource "azurerm_managed_disk" "db02_temp" {
+  name                = "mophazddhpdb02-temp"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 300
+
+  disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
+resource "azurerm_virtual_machine_data_disk_attachment" "db02_temp" {
+  managed_disk_id    = azurerm_managed_disk.db02_temp.id
+  virtual_machine_id = azurerm_windows_virtual_machine.db02.id
+
+  lun     = 4
+  caching = "None"
+}

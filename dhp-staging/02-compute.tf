@@ -11,8 +11,12 @@ resource "azurerm_network_interface" "stgapp01_nic" {
     subnet_id                     = azurerm_subnet.app.id
     private_ip_address_allocation = "Dynamic"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
 }
-
+}
 resource "azurerm_network_interface" "stgapp02_nic" {
   name                = "mophazsdhpapp02-nic"
   location            = azurerm_resource_group.rgstg.location
@@ -23,8 +27,12 @@ resource "azurerm_network_interface" "stgapp02_nic" {
     subnet_id                     = azurerm_subnet.app.id
     private_ip_address_allocation = "Dynamic"
   }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
 }
-
+}
 resource "azurerm_network_interface" "stgwfe01_nic" {
   name                = "mophazsdhpwfe01-nic"
   location            = azurerm_resource_group.rgstg.location
@@ -35,8 +43,12 @@ resource "azurerm_network_interface" "stgwfe01_nic" {
     subnet_id                     = azurerm_subnet.wfe.id
     private_ip_address_allocation = "Dynamic"
   }
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
 }
-
+}
 resource "azurerm_network_interface" "stgwfe02_nic" {
   name                = "mophazsdhpwfe02-nic"
   location            = azurerm_resource_group.rgstg.location
@@ -47,7 +59,13 @@ resource "azurerm_network_interface" "stgwfe02_nic" {
     subnet_id                     = azurerm_subnet.wfe.id
     private_ip_address_allocation = "Dynamic"
   }
+   lifecycle {
+    ignore_changes = [
+      tags
+    ]
 }
+}
+
 
 
 resource "azurerm_network_interface" "stgdb01_nic" {
@@ -60,6 +78,11 @@ resource "azurerm_network_interface" "stgdb01_nic" {
     subnet_id                     = azurerm_subnet.db.id
     private_ip_address_allocation = "Dynamic"
   }
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_network_interface" "stgdb02_nic" {
@@ -72,6 +95,11 @@ resource "azurerm_network_interface" "stgdb02_nic" {
     subnet_id                     = azurerm_subnet.db.id
     private_ip_address_allocation = "Dynamic"
   }
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 ##################################################
@@ -112,6 +140,11 @@ resource "azurerm_windows_virtual_machine" "stgapp01" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_windows_virtual_machine" "stgapp02" {
@@ -148,6 +181,12 @@ resource "azurerm_windows_virtual_machine" "stgapp02" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_windows_virtual_machine" "stgwfe01" {
@@ -184,6 +223,12 @@ resource "azurerm_windows_virtual_machine" "stgwfe01" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_windows_virtual_machine" "stgwfe02" {
@@ -220,6 +265,12 @@ resource "azurerm_windows_virtual_machine" "stgwfe02" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 
@@ -233,7 +284,7 @@ resource "azurerm_windows_virtual_machine" "stgdb01" {
   admin_password      = var.admin_password
   license_type        = local.windows_license_type
 
-  network_interface_ids = [azurerm_network_interface.stgapp01_nic.id]
+  network_interface_ids = [azurerm_network_interface.stgdb01_nic.id]
 
   encryption_at_host_enabled = true
   secure_boot_enabled        = true
@@ -257,6 +308,12 @@ resource "azurerm_windows_virtual_machine" "stgdb01" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 
@@ -270,7 +327,7 @@ resource "azurerm_windows_virtual_machine" "stgdb02" {
   admin_password      = var.admin_password
   license_type        = local.windows_license_type
 
-  network_interface_ids = [azurerm_network_interface.stgapp01_nic.id]
+  network_interface_ids = [azurerm_network_interface.stgdb02_nic.id]
 
   encryption_at_host_enabled = true
   secure_boot_enabled        = true
@@ -294,6 +351,12 @@ resource "azurerm_windows_virtual_machine" "stgdb02" {
     sku       = "2025-datacenter-g2"
     version   = "latest"
   }
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 ##################################################
 # Managed Data Disks - 500 GB, LUN 0
@@ -307,6 +370,12 @@ resource "azurerm_managed_disk" "stgapp01_data" {
   create_option          = "Empty"
   disk_size_gb           = 500
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgapp02_data" {
@@ -317,6 +386,12 @@ resource "azurerm_managed_disk" "stgapp02_data" {
   create_option          = "Empty"
   disk_size_gb           = 500
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgwfe01_data" {
@@ -327,6 +402,12 @@ resource "azurerm_managed_disk" "stgwfe01_data" {
   create_option          = "Empty"
   disk_size_gb           = 500
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgwfe02_data" {
@@ -337,6 +418,12 @@ resource "azurerm_managed_disk" "stgwfe02_data" {
   create_option          = "Empty"
   disk_size_gb           = 500
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgdb01_data" {
@@ -347,6 +434,12 @@ resource "azurerm_managed_disk" "stgdb01_data" {
   create_option          = "Empty"
   disk_size_gb           = 2500
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgdb02_data" {
@@ -357,6 +450,12 @@ resource "azurerm_managed_disk" "stgdb02_data" {
   create_option          = "Empty"
   disk_size_gb           = 2500
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "stgapp01_data" {
@@ -389,7 +488,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "stgwfe02_data" {
 
 resource "azurerm_virtual_machine_data_disk_attachment" "stgdb01_data" {
   managed_disk_id    = azurerm_managed_disk.stgdb01_data.id
-  virtual_machine_id = azurerm_windows_virtual_machine.stgapp01.id
+  virtual_machine_id = azurerm_windows_virtual_machine.stgdb01.id
   lun                = 0
   caching            = "ReadWrite"
 }
@@ -415,6 +514,12 @@ resource "azurerm_managed_disk" "stgapp01_log" {
   create_option          = "Empty"
   disk_size_gb           = 80
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgapp02_log" {
@@ -425,6 +530,12 @@ resource "azurerm_managed_disk" "stgapp02_log" {
   create_option          = "Empty"
   disk_size_gb           = 80
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgwfe01_log" {
@@ -435,6 +546,12 @@ resource "azurerm_managed_disk" "stgwfe01_log" {
   create_option          = "Empty"
   disk_size_gb           = 80
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 resource "azurerm_managed_disk" "stgwfe02_log" {
@@ -445,6 +562,12 @@ resource "azurerm_managed_disk" "stgwfe02_log" {
   create_option          = "Empty"
   disk_size_gb           = 80
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 resource "azurerm_managed_disk" "stgdb01_log" {
   name                   = "mophazsdhpdb01-log"
@@ -454,6 +577,12 @@ resource "azurerm_managed_disk" "stgdb01_log" {
   create_option          = "Empty"
   disk_size_gb           = 600
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 
 
@@ -465,6 +594,12 @@ resource "azurerm_managed_disk" "stgdb02_log" {
   create_option          = "Empty"
   disk_size_gb           = 600
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 resource "azurerm_virtual_machine_data_disk_attachment" "stgapp01_log" {
   managed_disk_id    = azurerm_managed_disk.stgapp01_log.id
@@ -519,6 +654,12 @@ resource "azurerm_managed_disk" "stgdb01_temp" {
   create_option          = "Empty"
   disk_size_gb           = 300
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
 resource "azurerm_managed_disk" "stgdb02_temp" {
   name                   = "mophazsdhpdb02-temp"
@@ -528,17 +669,23 @@ resource "azurerm_managed_disk" "stgdb02_temp" {
   create_option          = "Empty"
   disk_size_gb           = 300
   disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+
+     lifecycle {
+    ignore_changes = [
+      tags
+    ]
+}
 }
   resource "azurerm_virtual_machine_data_disk_attachment" "stgdb01_temp" {
-  managed_disk_id    = azurerm_managed_disk.stgdb01_log.id
+  managed_disk_id    = azurerm_managed_disk.stgdb01_temp.id
   virtual_machine_id = azurerm_windows_virtual_machine.stgdb01.id
-  lun                = 1
+  lun                = 2
   caching            = "None"
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "stgdb02_temp" {
-  managed_disk_id    = azurerm_managed_disk.stgdb02_log.id
+  managed_disk_id    = azurerm_managed_disk.stgdb02_temp.id
   virtual_machine_id = azurerm_windows_virtual_machine.stgdb02.id
-  lun                = 1
+  lun                = 2
   caching            = "None"
 }
