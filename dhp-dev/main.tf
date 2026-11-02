@@ -898,3 +898,51 @@ resource "azurerm_virtual_machine_data_disk_attachment" "db02_temp" {
   lun     = 4
   caching = "None"
 }
+
+resource "azurerm_managed_disk" "db01_templog" {
+  name                = "mophazddhpdb01-templog"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 300
+
+  disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
+resource "azurerm_virtual_machine_data_disk_attachment" "db01_templog" {
+  managed_disk_id    = azurerm_managed_disk.db01_templog.id
+  virtual_machine_id = azurerm_windows_virtual_machine.db01.id
+
+  lun     = 5
+  caching = "None"
+}
+
+resource "azurerm_managed_disk" "db02_templog" {
+  name                = "mophazddhpdb02-templog"
+  location            = azurerm_resource_group.rgdev.location
+  resource_group_name = azurerm_resource_group.rgdev.name
+
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 300
+
+  disk_encryption_set_id = azurerm_disk_encryption_set.des.id
+    lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
+resource "azurerm_virtual_machine_data_disk_attachment" "db02_templog" {
+  managed_disk_id    = azurerm_managed_disk.db02_templog.id
+  virtual_machine_id = azurerm_windows_virtual_machine.db02.id
+
+  lun     = 6
+  caching = "None"
+}
